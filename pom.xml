@@ -10,8 +10,6 @@
     <packaging>pom</packaging>
     <modules>
         <module>gateway</module>
-        <module>app-service001</module>
-        <module>app-service002</module>
         <module>service</module>
     </modules>
 
