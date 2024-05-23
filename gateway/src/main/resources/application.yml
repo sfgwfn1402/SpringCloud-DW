@@ -1,0 +1,11 @@
+server:
+  port: 80
+spring:
+  cloud:
+    gateway:
+      enabled: true
+      routes:
+        - id: app-service001 #路由唯一ID
+          uri: http://localhost:9001    #目标URI,
+          predicates: #断言，为真则匹配成功
+            - Path=/app1/** #配置规则Path，如果是app1开头的请求，则会将该请求转发到目标URL
