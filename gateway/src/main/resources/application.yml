@@ -5,6 +5,61 @@ spring:
   application:
     name: gateway
   cloud:
+    #整合sentinel,配置sentinel的地址
+    sentinel:
+      log:
+        dir: /tmp/logs/sentinel
+      transport:
+        port: 8719
+        dashboard: localhost:8858
+        filter:
+          enabled: false
+      #配置限流之后，响应内容
+      scg:
+        fallback:
+          ## 两种模式，一种是response返回文字提示信息，
+          ## 一种是redirect，重定向跳转，需要同时配置redirect(跳转的uri)
+          mode: response
+          ## 响应的状态
+          response-status: 200
+          ## 响应体
+          response-body: '{"code": 200,"message": "请求失败，稍后重试！"}'
+      datasource:
+        ds1: # 这个名字任意起
+          nacos:
+            server-addr: localhost:8848 # 配置nacos server 注册中心地址
+            username: nacos
+            password: nacos
+            dataId: sentinel-ds1-flow-rules # 和nacos中保持对应
+            groupId: SENTINEL_GROUP # 和 nacos中保持对应
+            data-type: json  # 规则类型：流控
+            rule-type: flow  # 对于 nacos 数据类型
+        ds2:
+          nacos:
+            server-addr: localhost:8848 # nacos服务地址
+            dataId: sentinel-ds2-flow-degrade-rules # # nacos的dataId
+            groupId: SENTINEL_GROUP # 默认分组
+            data-type: json # 数据类型 json类型
+            rule-type: degrade # degrade表示降级规则
+        system:
+          nacos:
+            server-addr: localhost:8848
+            dataId: ${spring.application.name}-system-rules
+            groupId: SENTINEL_GROUP
+            rule-type: system
+        authority:
+          nacos:
+            server-addr: localhost:8848
+            dataId: ${spring.application.name}-authority-rules
+            groupId: SENTINEL_GROUP
+            rule-type: authority
+        param-flow:
+          nacos:
+            server-addr: localhost:8848
+            dataId: ${spring.application.name}-param-flow-rules
+            groupId: SENTINEL_GROUP
+            rule-type: param-flow
+      eager: false # 是否启动时就加载规则，默认false
     #配置注册中心-------------------
     nacos:
       server-addr: localhost:8848
@@ -23,10 +78,12 @@ spring:
           '[/**]':
             allowedOrigins: "*"
             allowedMethods: "*"
+            allowedHeaders: "*"
+            allowCredentials: true
       #全局http超时-------------------
       httpclient:
         #配置超时时间 单位：毫秒
-        connect-timeout: 1000
+        connect-timeout: 10000
         #配置超时时间 单位：秒
         response-timeout: 5s
       #指标信息-------------------
@@ -45,6 +102,7 @@ spring:
 #            - Path=/app1/** #配置规则Path，如果是app1开头的请、求，则会将该请求转发到目标URL
             # 配置规则Path，如果是app-service001开头的请、求，则会将该请求转发到目标URL
             - Path=/app-service001/**
+#            - Weight=20 # 权重，默认为1，越大匹配度越高
           filters:
             # 定义了一个 Filter，所有的请求转发至下游服务时会添加请求头 X-Request-Foo:Bar ，
             # 由AddRequestHeaderGatewayFilterFactory 来生产。
@@ -54,10 +112,44 @@ spring:
             # 去掉请求路径前缀，如：http://localhost/app-service001/app1/test -> lb://app-service001/app1/test
             # http://网关地址：端口/服务中心注册 serviceId/具体的url
             - StripPrefix=1
+            # 熔断器配置-------------------
+            - name: Hystrix
+              args:
+                name: fallbackCmd # 熔断器名称
+                fallbackUri: 'forward:/fallbackCmd' # 熔断后，转发到fallbackUri指定的地址，默认是forward:/
           #配置每条路由超时
           metadata:
             response-timeout: 200 # 自定义响应超时时间，单位：毫秒
             connect-timeout: 200 # 自定义连接超时时间，单位：毫秒
+      #全局熔断降级配置-------------------
+      default-filters: # 默认过滤器
+        - name: Hystrix
+          args:
+            name: default
+            #转发地址
+            fallbackUri: 'forward:/fallback'
+#hystrix配置，信号量隔离，5秒后自动超时
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          strategy: SEMAPHORE # 隔离策略，默认是线程池隔离
+          thread:
+            timeoutInMilliseconds: 60000 # 超时时间，单位：毫秒
+    fallbackCmd:
+      execution:
+        isolation:
+          strategy: SEMAPHORE
+          thread: #5秒没响应自动熔断 跳转到配置的fallbackUri
+            timeoutInMilliseconds: 5000
+      circuitBreaker: #熔断器配置
+        enabled: true
+#        requestVolumeThreshold: 20 # 熔断器开启的最小请求数
+        errorThresholdPercentage: 50 # 错误率达到50%熔断器开启
+        sleepWindowInMilliseconds: 5000 # 熔断器休眠时间
+        resetTimeInMilliseconds: 30000 # 熔断器重置时间
+
 management:
   endpoint:
     health:

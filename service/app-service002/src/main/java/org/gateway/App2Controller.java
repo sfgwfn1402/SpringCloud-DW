@@ -6,11 +6,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/app1")
-public class App1Controller {
+public class App2Controller {
 
     @GetMapping("/test")
     public Object test() throws InterruptedException {
-//        Thread.sleep(6000);
-        return "app1";
+//        Thread.sleep(3000);
+        return "app2";
     }
 }

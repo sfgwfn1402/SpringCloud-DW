@@ -1,0 +1,17 @@
+server:
+  port: 9002
+
+spring:
+  application:
+    name: app-service001
+  cloud:
+    #配置注册中心
+    nacos:
+      server-addr: localhost:8848
+      #配合注册中心
+      discovery:
+        locator:
+          #开启服务发现动态路由
+          enabled: true
+          #是否将服务名称小写
+          lower-case-service-id: true
