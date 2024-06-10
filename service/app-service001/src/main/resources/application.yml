@@ -1,9 +1,16 @@
 server:
-  port: 9001
-
+  port: 8101
+  servlet:
+    session:
+      cookie:
+        name: CLIENTSESSIONMEMBER
 spring:
   application:
     name: app-service001
+  thymeleaf:
+    prefix: classpath:/templates/
+  main:
+    allow-bean-definition-overriding: true
   cloud:
     #配置注册中心
     nacos:
@@ -15,3 +22,22 @@ spring:
           enabled: true
           #是否将服务名称小写
           lower-case-service-id: true
+#hbase配置
+hbase:
+  zookeeper:
+    quorum: localhost
+    property:
+      clientPort: 2181
+
+zookeeper:
+  znode:
+    parent: /hbase
+security:
+  oauth2:
+    client:
+      client-id: MemberSystem
+      client-secret: 12345
+      access-token-uri: http://localhost:8202/oauth/token  #获取token地址
+      user-authorization-uri: http://localhost:8202/oauth/authorize  #认证地址
+    resource:
+      user-info-uri: http://localhost:8202/user/me  #获取当前用户信息地址

@@ -12,7 +12,6 @@
     <packaging>pom</packaging>
 
     <name>service</name>
-    <url>http://maven.apache.org</url>
     <modules>
         <module>app-service001</module>
         <module>app-service002</module>
