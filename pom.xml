@@ -13,6 +13,8 @@
         <module>service</module>
         <module>auth</module>
         <module>auth-gateway</module>
+        <module>skywalking</module>
+        <module>cloud-common</module>
     </modules>
 
     <properties>

@@ -31,6 +31,8 @@
     <file url="file://$PROJECT_DIR$/auth/common-base/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/auth/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/auth/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/cloud-common/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/cloud-common/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/gateway/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/gateway/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/service/app-service001/src/main/java" charset="UTF-8" />
@@ -39,6 +41,16 @@
     <file url="file://$PROJECT_DIR$/service/app-service002/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/skywalking/skywalking-alarm1004/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/skywalking/skywalking-alarm1004/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/skywalking/skywalking-gateway1003/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/skywalking/skywalking-gateway1003/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/skywalking/skywalking-order1002/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/skywalking/skywalking-order1002/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/skywalking/skywalking-product1001/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/skywalking/skywalking-product1001/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/skywalking/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/skywalking/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
   </component>
