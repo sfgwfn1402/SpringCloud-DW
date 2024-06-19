@@ -1,0 +1,46 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.dwcloud</groupId>
+        <artifactId>Demo</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <artifactId>feign</artifactId>
+    <packaging>pom</packaging>
+    
+    <modules>
+        <module>feign-client</module>
+        <module>feign-core</module>
+        <module>feign-starter</module>
+        <module>feign-provider</module>
+        <module>feign-consumer</module>
+    </modules>
+
+    <properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <spring-boot.version>1.5.22.RELEASE</spring-boot.version>
+        <okhttp.version>4.8.1</okhttp.version>
+<!--        <spring.boot.version>2.3.12.RELEASE</spring.boot.version>-->
+<!--        <spring.cloud.version>Hoxton.SR12</spring.cloud.version>-->
+<!--        <spring.cloud.alibaba.version>2.2.9.RELEASE</spring.cloud.alibaba.version>-->
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp</artifactId>
+                <version>${okhttp.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+</project>

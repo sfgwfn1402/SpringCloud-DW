@@ -1,0 +1,3 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+    com.dwcloud.starter.HttpClientAuthConfig,\
+    com.dwcloud.starter.SpringMvcConfigurerAutoConfig
