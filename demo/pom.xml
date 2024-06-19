@@ -13,6 +13,7 @@
 
     <modules>
         <module>feign</module>
+        <module>test</module>
     </modules>
 
     <properties>

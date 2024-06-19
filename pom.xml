@@ -16,6 +16,7 @@
         <module>skywalking</module>
         <module>cloud-common</module>
         <module>demo</module>
+        <module>demo/test</module>
     </modules>
 
     <properties>
