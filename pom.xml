@@ -15,7 +15,7 @@
         <module>auth-gateway</module>
         <module>skywalking</module>
         <module>cloud-common</module>
-        <module>Demo</module>
+        <module>demo</module>
     </modules>
 
     <properties>

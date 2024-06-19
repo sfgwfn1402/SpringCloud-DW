@@ -7,9 +7,9 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>Demo</artifactId>
+    <artifactId>demo</artifactId>
     <packaging>pom</packaging>
-    <name>Demo</name>
+    <name>demo</name>
 
     <modules>
         <module>feign</module>
