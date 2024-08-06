@@ -16,6 +16,9 @@ public class DataDistributor {
     // 是否暂停标志
     private static boolean paused = false;
 
+    // 上一次分发数据的时间戳
+    private static long lastDispatchTime = 0;
+
     static {
         // 初始化缓存，添加100个数据点
         for (int i = 0; i < 100; i++) {
@@ -33,26 +36,26 @@ public class DataDistributor {
         int totalFrames = 100; // 总共的数据点数量
 
         // 计算每帧之间的延迟时间（毫秒）
-        long delay = 1000 / frameRate;
+        long frameInterval = 1000 / frameRate;
 
         // 计算从哪个位置开始
         currentFrame = (int) (totalFrames * startPercentage / 100.0);
 
         while (!paused && currentFrame < totalFrames) {
-            if (currentFrame < totalFrames) {
+            long currentTime = System.currentTimeMillis();
+            // 计算从上一次分发到现在经过的时间
+            long elapsedTime = currentTime - lastDispatchTime;
+
+            // 如果已经达到了下一帧的时间间隔
+            if (elapsedTime >= frameInterval) {
                 DataPoint point = cache.get(currentFrame);
                 System.out.println("每秒帧率: " + frameRate + ",时间: " + DateUtil.format(DateUtil.date(), "HH:mm:ss.SSS") + ", 正在分发: " + point);
 
-                try {
-                    // 线程暂停指定的时间
-                    Thread.sleep(delay);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    System.out.println("线程被中断");
-                }
-
                 // 更新当前处理的位置
                 currentFrame++;
+
+                // 更新上一次分发的时间
+                lastDispatchTime = currentTime;
             }
         }
     }
