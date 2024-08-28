@@ -22,11 +22,12 @@ import java.nio.file.Paths;
 public class TestLucene {
     static Directory directory = new RAMDirectory(); // 使用内存索引，也可以使用其他存储方式
 
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args) throws Exception {
         createIndex();
         search();
 
     }
+
     public static void search() throws IOException, ParseException {
         // 定义索引存储目录
 //        Directory directory = FSDirectory.open(Paths.get("/tmp/lucene"));
@@ -42,8 +43,11 @@ public class TestLucene {
 //        // 解析查询关键词
 //        String keywords = "120";
 //        Query query = queryParser.parse(keywords);
-        TermQuery termQuery = new TermQuery(new Term("carA", "130"));
-        TopDocs topDocs = indexSearcher.search(termQuery, 100);
+        BooleanQuery.Builder builder = new BooleanQuery.Builder();
+        builder.add(new TermQuery(new Term("carA", "1201")), BooleanClause.Occur.MUST);
+        builder.add(new TermQuery(new Term("point", "1301")), BooleanClause.Occur.MUST);
+
+        TopDocs topDocs = indexSearcher.search(builder.build(), 100);
         // 进行搜索
 //        TopDocs topDocs = indexSearcher.search(query, 10);
         // 获取搜索结果
@@ -52,17 +56,18 @@ public class TestLucene {
             // 获取文档
             Document document = indexSearcher.doc(scoreDoc.doc);
             // 获取文件名
-            String fileName = document.get("fileName");
+            String car = document.get("carA");
             // 获取内容
-            String content = document.get("carA");
+            String content = document.get("point");
             // 获取文档得分
             float score = scoreDoc.score;
-            System.out.println(fileName + " " + content + " " + score);
+            System.out.println(car + " " + content + " " + score);
         }
         // 关闭reader
         indexReader.close();
 
     }
+
     public static void createIndex() throws IOException {
         // 定义索引存储目录
 //        Directory directory = FSDirectory.open(Paths.get("/tmp/lucene"));
@@ -82,18 +87,17 @@ public class TestLucene {
 //        document.add(new TextField("content", new String(Files.readAllBytes(file.toPath())), Field.Store.NO));
 
         // 2. 添加文档字段
-        document.add(new StringField("id", "001", Field.Store.YES));
-        document.add(new TextField("title", "Java程序设计", Field.Store.YES));
-        document.add(new TextField("content", "Java程序设计入门到精通", Field.Store.YES));
-        document.add(new TextField("carA", "120", Field.Store.YES));
-        document.add(new TextField("carA", "130", Field.Store.YES));
-        document.add(new TextField("carA", "A001", Field.Store.YES));
+        for (int i = 0; i < 10; i++) {
+            document.add(new TextField("content", "Java程序设计入门到精通", Field.Store.YES));
+            document.add(new TextField("carA", "120" + i, Field.Store.YES));
+            document.add(new TextField("point", "130" + i, Field.Store.YES));
+            // 添加文档到索引库
+            indexWriter.addDocument(document);
+            // 提交索引
+            indexWriter.commit();
+        }
 
 
-        // 添加文档到索引库
-        indexWriter.addDocument(document);
-        // 提交索引
-        indexWriter.commit();
         // 关闭writer
         indexWriter.close();
     }

@@ -174,6 +174,12 @@
             <artifactId>lucene-queryparser</artifactId>
             <version>8.9.0</version> <!-- 请根据需要调整版本号 -->
         </dependency>
+        <dependency>
+            <groupId>com.janeluo</groupId>
+            <artifactId>ikanalyzer</artifactId>
+            <version>2012_u6</version>
+        </dependency>
+
     </dependencies>
     <build>
         <plugins>
