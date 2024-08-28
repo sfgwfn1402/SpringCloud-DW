@@ -117,7 +117,7 @@ public class TestLucene {
         Query queryCar = new TermQuery(new Term("carA", carValue));
         Query queryPoint = new TermQuery(new Term("point", pointValue));
         BooleanQuery.Builder builder = new BooleanQuery.Builder();
-        builder.add(queryCar, BooleanClause.Occur.MUST);
+        builder.add(queryCar, BooleanClause.Occur.SHOULD);
         builder.add(queryPoint, BooleanClause.Occur.MUST);
         TopDocs topDocs = indexSearcher.search(builder.build(), 100);
 
