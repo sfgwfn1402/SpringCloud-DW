@@ -1,6 +1,7 @@
 package com.dwcloud.lucene;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.core.KeywordAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -43,9 +44,10 @@ public class TestLucene {
 //        // 解析查询关键词
 //        String keywords = "120";
 //        Query query = queryParser.parse(keywords);
+
         BooleanQuery.Builder builder = new BooleanQuery.Builder();
-        builder.add(new TermQuery(new Term("carA", "1201")), BooleanClause.Occur.MUST);
-        builder.add(new TermQuery(new Term("point", "1301")), BooleanClause.Occur.MUST);
+        builder.add(new TermQuery(new Term("carA", "1202")), BooleanClause.Occur.MUST);
+        builder.add(new TermQuery(new Term("point", "1302")), BooleanClause.Occur.MUST);
 
         TopDocs topDocs = indexSearcher.search(builder.build(), 100);
         // 进行搜索
@@ -72,7 +74,7 @@ public class TestLucene {
         // 定义索引存储目录
 //        Directory directory = FSDirectory.open(Paths.get("/tmp/lucene"));
         // 定义分析器
-        Analyzer analyzer = new StandardAnalyzer();
+        KeywordAnalyzer analyzer = new KeywordAnalyzer();
         // 配置索引写入器
         IndexWriterConfig indexWriterConfig = new IndexWriterConfig(analyzer);
         IndexWriter indexWriter = new IndexWriter(directory, indexWriterConfig);
@@ -95,11 +97,57 @@ public class TestLucene {
             indexWriter.addDocument(document);
             // 提交索引
             indexWriter.commit();
+            // 在createIndex方法结束后，可以立即添加一个验证查询的代码段
+            searchExact("120" + i, "130" + i); // 临时添加，验证索引
         }
 
 
         // 关闭writer
         indexWriter.close();
+        printAllDocuments();
     }
 
+
+    // 添加方法
+    private static void searchExact(String carValue, String pointValue) throws IOException {
+        IndexReader indexReader = DirectoryReader.open(directory);
+        IndexSearcher indexSearcher = new IndexSearcher(indexReader);
+
+        // 使用精确TermQuery进行验证
+        Query queryCar = new TermQuery(new Term("carA", carValue));
+        Query queryPoint = new TermQuery(new Term("point", pointValue));
+        BooleanQuery.Builder builder = new BooleanQuery.Builder();
+        builder.add(queryCar, BooleanClause.Occur.MUST);
+        builder.add(queryPoint, BooleanClause.Occur.MUST);
+        TopDocs topDocs = indexSearcher.search(builder.build(), 100);
+
+        // 输出验证结果
+        System.out.println("验证查询结果:");
+        for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
+            Document document = indexSearcher.doc(scoreDoc.doc);
+            System.out.println(document.get("carA") + " " + document.get("point") + " " + scoreDoc.score);
+        }
+
+        indexReader.close();
+    }
+    public static void printAllDocuments() throws IOException {
+        // 打开索引
+        IndexReader indexReader = DirectoryReader.open(directory);
+        // 创建搜索器
+        IndexSearcher indexSearcher = new IndexSearcher(indexReader);
+
+        // 获取索引中的所有文档
+        int numDocs = indexReader.numDocs();
+        for (int i = 0; i < numDocs; i++) {
+            Document document = indexSearcher.doc(i);
+            System.out.println("Document " + i + ":");
+            System.out.println("Content: " + document.get("content"));
+            System.out.println("carA: " + document.get("carA"));
+            System.out.println("point: " + document.get("point"));
+            System.out.println();
+        }
+
+        // 关闭reader
+        indexReader.close();
+    }
 }
