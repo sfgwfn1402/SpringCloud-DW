@@ -158,28 +158,32 @@
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-core</artifactId>
-            <version>8.0.0</version>
+            <version>8.9.0</version>
         </dependency>
         <!-- 如果你需要其他Lucene模块，比如分析器、查询解析器等，也可以添加相应的依赖 -->
         <!-- Lucene Analyzers Common -->
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-analyzers-common</artifactId>
-            <version>8.0.0</version> <!-- 请根据需要调整版本号 -->
+            <version>8.9.0</version> <!-- 请根据需要调整版本号 -->
         </dependency>
 
         <!-- Lucene QueryParser -->
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-queryparser</artifactId>
-            <version>8.0.0</version> <!-- 请根据需要调整版本号 -->
+            <version>8.9.0</version> <!-- 请根据需要调整版本号 -->
         </dependency>
         <dependency>
             <groupId>com.janeluo</groupId>
             <artifactId>ikanalyzer</artifactId>
             <version>2012_u6</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>1.2.75</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
