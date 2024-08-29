@@ -21,7 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class TestLucene {
-    static Directory directory = new RAMDirectory(); // 使用内存索引，也可以使用其他存储方式
+//    static Directory directory = new RAMDirectory(); // 使用内存索引，也可以使用其他存储方式
 
     public static void main(String[] args) throws Exception {
         createIndex();
@@ -31,7 +31,7 @@ public class TestLucene {
 
     public static void search() throws IOException, ParseException {
         // 定义索引存储目录
-//        Directory directory = FSDirectory.open(Paths.get("/tmp/lucene"));
+        Directory directory = FSDirectory.open(Paths.get("/tmp/lucene"));
 
         // 打开索引
         IndexReader indexReader = DirectoryReader.open(directory);
@@ -46,8 +46,8 @@ public class TestLucene {
 //        Query query = queryParser.parse(keywords);
 
         BooleanQuery.Builder builder = new BooleanQuery.Builder();
-        builder.add(new TermQuery(new Term("carA", "1202")), BooleanClause.Occur.MUST);
-        builder.add(new TermQuery(new Term("point", "1302")), BooleanClause.Occur.MUST);
+        builder.add(new TermQuery(new Term("carA", "1203")), BooleanClause.Occur.MUST);
+        builder.add(new TermQuery(new Term("point", "1303")), BooleanClause.Occur.MUST);
 
         TopDocs topDocs = indexSearcher.search(builder.build(), 100);
         // 进行搜索
@@ -72,8 +72,8 @@ public class TestLucene {
 
     public static void createIndex() throws IOException {
         // 定义索引存储目录
-//        Directory directory = FSDirectory.open(Paths.get("/tmp/lucene"));
-        // 定义分析器
+        Directory directory = FSDirectory.open(Paths.get("/tmp/lucene"));
+        // 定义分析、器
         KeywordAnalyzer analyzer = new KeywordAnalyzer();
         // 配置索引写入器
         IndexWriterConfig indexWriterConfig = new IndexWriterConfig(analyzer);
@@ -90,6 +90,7 @@ public class TestLucene {
 
         // 2. 添加文档字段
         for (int i = 0; i < 10; i++) {
+            document = new Document();
             document.add(new TextField("content", "Java程序设计入门到精通", Field.Store.YES));
             document.add(new TextField("carA", "120" + i, Field.Store.YES));
             document.add(new TextField("point", "130" + i, Field.Store.YES));
@@ -98,7 +99,7 @@ public class TestLucene {
             // 提交索引
             indexWriter.commit();
             // 在createIndex方法结束后，可以立即添加一个验证查询的代码段
-            searchExact("120" + i, "130" + i); // 临时添加，验证索引
+//            searchExact("120" + i, "130" + i); // 临时添加，验证索引
         }
 
 
@@ -110,6 +111,7 @@ public class TestLucene {
 
     // 添加方法
     private static void searchExact(String carValue, String pointValue) throws IOException {
+        Directory directory = FSDirectory.open(Paths.get("/tmp/lucene"));
         IndexReader indexReader = DirectoryReader.open(directory);
         IndexSearcher indexSearcher = new IndexSearcher(indexReader);
 
@@ -130,7 +132,10 @@ public class TestLucene {
 
         indexReader.close();
     }
+
     public static void printAllDocuments() throws IOException {
+        Directory directory = FSDirectory.open(Paths.get("/tmp/lucene"));
+
         // 打开索引
         IndexReader indexReader = DirectoryReader.open(directory);
         // 创建搜索器
