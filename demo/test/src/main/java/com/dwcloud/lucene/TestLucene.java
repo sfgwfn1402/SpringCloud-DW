@@ -1,29 +1,19 @@
 package com.dwcloud.lucene;
 
-import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
-import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.core.KeywordAnalyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.*;
-import org.apache.lucene.queryparser.classic.ParseException;
-import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.*;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.store.RAMDirectory;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
+import java.io.*;
 import java.nio.file.Paths;
 import java.util.List;
 
@@ -34,14 +24,18 @@ public class TestLucene {
 
     public static void main(String[] args) throws Exception {
         TestLucene testLucene = new TestLucene();
+        // 写测试日志
+//        testLucene.writeLog();
+
         // 创建索引并初始化数据
 //        testLucene.createIndex();
 
-        // 搜索内容
-        String plateNumber = "京A1000" + 1;//1到10
-        String point = "116.30" + 9 + ",39.98" + 9;//1到10
+        // 搜索内容 京A1000999","point":"116.309983,39.989983
+        String plateNumber = "京A1000999";//1到10
+        String point = "116.309983,39.989983";//1到10
+        long current = DateUtil.current(false);
         VehiclePoint vp = testLucene.search(plateNumber, point);
-        System.out.println(JSON.toJSONString(vp));
+        System.out.println("查询耗时:" + (DateUtil.current(false) - current) + "毫秒, 结果: " + JSON.toJSONString(vp));
 
     }
 
@@ -168,44 +162,155 @@ public class TestLucene {
         }
     }
 
+
     /**
      * 解析文件并添加数据
      */
     public void addDocument(IndexWriter indexWriter) {
         try {
-
             //1. 解析文件内容
-            List<VehiclePoint> vehiclePoint = Lists.newArrayList();
+            List<VehiclePoint> vehiclePoints = Lists.newArrayList();
+            String filePath = "d:/data/lucene/test.log";
+            BufferedReader reader = null;
 
-            int count = vehiclePoint.size();
+            try {
+                reader = new BufferedReader(new FileReader(filePath));
+                String line;
+                int n = 0;
+                while ((line = reader.readLine()) != null) {
+                    VehiclePoint vp = JSON.parseObject(line, VehiclePoint.class);
+                    vehiclePoints.add(vp);
+                    n++;
+                    if (n % 1000000 == 0){
+                        // 1000000条数据写入索引库
+                        dataInsertIndex(indexWriter, vehiclePoints);
+                        // 清空集合
+                        vehiclePoints.clear();
+                        n = 0;
+                    }
+                }
+                if (vehiclePoints.size() > 0){
+                    dataInsertIndex(indexWriter, vehiclePoints);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            System.out.println("添加数据到索引库完成！");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-            //2. 设置文档并添加到索引库
-            for (int i = 0; i < 10; i++) {
-                for (int j = 0; j < 10; j++) {
-                    Document document = new Document();
+    private void dataInsertIndex(IndexWriter indexWriter, List<VehiclePoint> vehiclePoints) throws IOException {
+        int count = vehiclePoints.size();
+
+        // 设置文档并添加到索引库
+        List<Document> documents = Lists.newArrayList();
+        for (int i = 0; i < count; i++) {
+            Document document = new Document();
+            //车牌号
+            document.add(new TextField(VehiclePointFieldName.PLATE_NUMBER, vehiclePoints.get(i).getPlateNumber(), Field.Store.YES));
+            //经纬度
+            document.add(new TextField(VehiclePointFieldName.POINT, vehiclePoints.get(i).getPoint(), Field.Store.YES));
+            //时间
+            document.add(new TextField(VehiclePointFieldName.TIME, vehiclePoints.get(i).getTime(), Field.Store.YES));
+            //速度
+            document.add(new TextField(VehiclePointFieldName.SPEED, vehiclePoints.get(i).getSpeed(), Field.Store.YES));
+            //其它
+            document.add(new TextField(VehiclePointFieldName.OTHER, vehiclePoints.get(i).getOther(), Field.Store.YES));
+            documents.add(document);
+            System.out.println("添加数据到索引库进度：" + i + "/" + count);
+        }
+        // 添加文档到索引库
+        indexWriter.addDocuments(documents);
+        // 提交索引
+        indexWriter.commit();
+    }
+
+    /**
+     * 解析文件内容
+     */
+    private void parseFilecontents(List<VehiclePoint> vehiclePoint) {
+        String filePath = "d:/data/lucene/test.log";
+        BufferedReader reader = null;
+
+        try {
+            reader = new BufferedReader(new FileReader(filePath));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                VehiclePoint vp = JSON.parseObject(line, VehiclePoint.class);
+                vehiclePoint.add(vp);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    /**
+     * 写测试日志
+     */
+    public void writeLog() {
+        BufferedWriter writer = null;
+        try {
+            File file = new File("d:/data/lucene/test.log");
+            writer = new BufferedWriter(new FileWriter(file));
+            for (int i = 0; i < 1000; i++) {
+                for (int j = 0; j < 10000; j++) {
+                    VehiclePoint vp = new VehiclePoint();
                     //车牌号
-                    document.add(new TextField(VehiclePointFieldName.PLATE_NUMBER, "京A1000" + i, Field.Store.YES));
+                    vp.setPlateNumber("京A1000" + i);
                     //经纬度
-                    document.add(new TextField(VehiclePointFieldName.POINT, "116.30" + j + ",39.98" + j, Field.Store.YES));
+                    vp.setPoint("116.30" + j + ",39.98" + j);
                     //时间
-                    document.add(new TextField(VehiclePointFieldName.TIME, DateUtil.current(false) + "", Field.Store.YES));
+                    vp.setTime(DateUtil.current(false) + "");
                     //速度
-                    document.add(new TextField(VehiclePointFieldName.SPEED, "60" + j, Field.Store.YES));
+                    vp.setSpeed("60" + j);
                     //其它
-                    document.add(new TextField(VehiclePointFieldName.OTHER, "其它信息" + j, Field.Store.YES));
-
-                    // 添加文档到索引库
-                    indexWriter.addDocument(document);
-                    // 提交索引
-                    indexWriter.commit();
+                    vp.setOther("其它信息" + j);
                     //输出文件
-
+                    writeFile(JSON.toJSONString(vp), writer);
+                    System.out.println("写日志进度：" + i + "," + j);
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            if (writer != null) {
+                try {
+                    writer.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
+    }
 
+    /**
+     * 写一个方法，将内容输出到指定的文件中
+     */
+    public void writeFile(String content, BufferedWriter writer) {
+        try {
+            writer.write(content);
+            writer.newLine(); // 添加换行符
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -266,24 +371,6 @@ public class TestLucene {
         indexReader.close();
     }
 
-    /**
-     * 车辆坐标点
-     */
-    @Data
-    class VehiclePoint {
-        //车牌号，需要索引
-        private String plateNumber;
-        //坐标点（经度,纬度），需要索引
-        private String point;
-        //时间
-        private String time;
-        //速度
-        private String speed;
-        //其它
-        private String other;
-        //评分
-        private String score;
-    }
 
     /**
      * 定义车辆坐标点字段名称常量值
