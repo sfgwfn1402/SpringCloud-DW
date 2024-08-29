@@ -31,8 +31,10 @@ public class TestLucene {
 //        testLucene.createIndex();
 
         // 搜索内容 京A1000999","point":"116.309983,39.989983
-        String plateNumber = "京A1000999";//1到10
+//        String plateNumber = "京A1000999";//1到10
+        String plateNumber = "";//1到10
         String point = "116.309983,39.989983";//1到10
+//        String point = "";//1到10
         long current = DateUtil.current(false);
         VehiclePoint vp = testLucene.search(plateNumber, point);
         System.out.println("查询耗时:" + (DateUtil.current(false) - current) + "毫秒, 结果: " + JSON.toJSONString(vp));
