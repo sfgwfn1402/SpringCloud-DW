@@ -83,7 +83,7 @@
     </appender>
 
     <!-- 设置默认日志级别 -->
-    <root level="DEBUG">
+    <root level="info">
         <appender-ref ref="stdout" />
         <appender-ref ref="fileInfoLog" />
         <appender-ref ref="fileErrorLog" />
