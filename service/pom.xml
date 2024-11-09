@@ -15,6 +15,7 @@
     <modules>
         <module>app-service001</module>
         <module>app-service002</module>
+        <module>clickhouse-service</module>
     </modules>
 
 </project>

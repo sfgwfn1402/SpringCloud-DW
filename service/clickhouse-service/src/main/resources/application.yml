@@ -1,0 +1,19 @@
+server:
+  port: 8103
+spring:
+  application:
+    name: clickhouse-service
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    click:
+      driverClassName: ru.yandex.clickhouse.ClickHouseDriver
+      url: jdbc:clickhouse://localhost:8123/default
+      username: default
+      password:
+      initialSize: 10
+      maxActive: 100
+      minIdle: 10
+      maxWait: 6000
+mybatis:
+  type-aliases-package: org.gateway
+  mapper-locations: classpath:/mapper/*.xml
